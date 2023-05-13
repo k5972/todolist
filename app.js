@@ -14,7 +14,21 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
 // mongoose.connect("mongodb://localhost:27017/todolistDB", {useNewUrlParser: true});
-mongoose.connect("mongodb+srv://kyranicolearona:NlNSfVh323l4x9ta@cluster0.ncdjuqi.mongodb.net/todolistDB", {useNewUrlParser: true});
+
+const PORT = process.env.PORT || 3000;
+const MONGO_URI = "mongodb+srv://kyranicolearona:NlNSfVh323l4x9ta@cluster0.ncdjuqi.mongodb.net/todolistDB";
+
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(MONGO_URI);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+}
+
+//Routes go here
 
 const itemSchema = {
   name: String
@@ -148,6 +162,9 @@ app.post("/delete", function(req, res){
 
 })
 
-app.listen(3000, function() {
-  console.log("Server started on port 3000");
-});
+//Connect to the database before listening
+connectDB().then(() => {
+  app.listen(PORT, () => {
+      console.log("listening for requests");
+  })
+})
